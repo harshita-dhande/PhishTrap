@@ -1,0 +1,370 @@
+[
+  {
+    "run_id": "3f48e3df",
+    "timestamp": "2026-09-03 12:27:58",
+    "filename": "lure_combined_1788177874.eml",
+    "verdict": "malicious",
+    "combined_score": 0.95,
+    "sender": "billing@fake-vendor-demo.test",
+    "subject": "Invoice / Document \u2014 Action Required",
+    "vector_verdicts": {
+      "image_password": "malicious",
+      "links": "suspicious",
+      "pdf": "malicious",
+      "text_language": "clean",
+      "detonation_behavior": "clean"
+    }
+  },
+  {
+    "run_id": "bb2ebcdd",
+    "timestamp": "2026-09-04 03:43:32",
+    "filename": "lure_combined_1788177874.eml",
+    "verdict": "malicious",
+    "combined_score": 0.95,
+    "sender": "billing@fake-vendor-demo.test",
+    "subject": "Invoice / Document \u2014 Action Required",
+    "vector_verdicts": {
+      "image_password": "malicious",
+      "links": "suspicious",
+      "pdf": "malicious",
+      "text_language": "clean",
+      "detonation_behavior": "clean"
+    }
+  },
+  {
+    "run_id": "66e6f21b",
+    "timestamp": "2026-09-04 04:14:49",
+    "filename": "lure_combined_1788495191.eml",
+    "verdict": "low_confidence",
+    "combined_score": 0.17,
+    "sender": "billing@fake-vendor-demo.test",
+    "subject": "Invoice / Document \u2014 Action Required",
+    "vector_verdicts": {
+      "image_password": "clean",
+      "links": "suspicious",
+      "pdf": "malicious",
+      "text_language": "clean",
+      "detonation_behavior": "clean"
+    }
+  },
+  {
+    "run_id": "b47a595c",
+    "timestamp": "2026-09-04 04:28:53",
+    "filename": "lure_combined_1788496004.eml",
+    "verdict": "malicious",
+    "combined_score": 0.95,
+    "sender": "billing@fake-vendor-demo.test",
+    "subject": "Invoice / Document \u2014 Action Required",
+    "vector_verdicts": {
+      "image_password": "malicious",
+      "links": "suspicious",
+      "pdf": "malicious",
+      "text_language": "clean",
+      "detonation_behavior": "clean"
+    }
+  },
+  {
+    "run_id": "ac850d12",
+    "timestamp": "2026-09-04 04:37:58",
+    "filename": "lure_combined_1788496625.eml",
+    "verdict": "malicious",
+    "combined_score": 0.95,
+    "sender": "billing@fake-vendor-demo.test",
+    "subject": "Invoice / Document \u2014 Action Required",
+    "vector_verdicts": {
+      "image_password": "malicious",
+      "links": "suspicious",
+      "pdf": "malicious",
+      "text_language": "clean",
+      "detonation_behavior": "clean"
+    }
+  },
+  {
+    "run_id": "9e98b55e",
+    "timestamp": "2026-09-04 06:34:28",
+    "filename": "lure_combined_1788503573.eml",
+    "verdict": "malicious",
+    "combined_score": 0.95,
+    "sender": "billing@fake-vendor-demo.test",
+    "subject": "Invoice / Document \u2014 Action Required",
+    "vector_verdicts": {
+      "image_password": "malicious",
+      "links": "suspicious",
+      "pdf": "malicious",
+      "text_language": "clean",
+      "detonation_behavior": "malicious"
+    }
+  },
+  {
+    "run_id": "aff3da7c",
+    "timestamp": "2026-09-04 06:43:20",
+    "filename": "lure_combined_1788503990.eml",
+    "verdict": "low_confidence",
+    "combined_score": 0.18,
+    "sender": "billing@fake-vendor-demo.test",
+    "subject": "Invoice / Document \u2014 Action Required",
+    "vector_verdicts": {
+      "image_password": "clean",
+      "links": "suspicious",
+      "pdf": "malicious",
+      "text_language": "clean",
+      "detonation_behavior": "clean"
+    }
+  },
+  {
+    "run_id": "b629932a",
+    "timestamp": "2026-09-04 06:52:45",
+    "filename": "lure_combined_1788504633.eml",
+    "verdict": "malicious",
+    "combined_score": 0.95,
+    "sender": "billing@fake-vendor-demo.test",
+    "subject": "Invoice / Document \u2014 Action Required",
+    "vector_verdicts": {
+      "image_password": "malicious",
+      "links": "suspicious",
+      "pdf": "malicious",
+      "text_language": "clean",
+      "detonation_behavior": "malicious"
+    }
+  },
+  {
+    "run_id": "e599efd5",
+    "timestamp": "2026-09-04 14:50:42",
+    "filename": "lure_combined_1788533267.eml",
+    "verdict": "malicious",
+    "combined_score": 0.95,
+    "sender": "billing@fake-vendor-demo.test",
+    "subject": "Invoice / Document \u2014 Action Required",
+    "vector_verdicts": {
+      "image_password": "malicious",
+      "links": "suspicious",
+      "pdf": "malicious",
+      "text_language": "clean",
+      "detonation_behavior": "malicious"
+    }
+  },
+  {
+    "run_id": "5d1e660c",
+    "timestamp": "2026-10-05 06:43:11",
+    "filename": "lure_image_only_1791182510.eml",
+    "verdict": "malicious",
+    "combined_score": 0.95,
+    "sender": "billing@fake-vendor-demo.test",
+    "subject": "Invoice / Document \u2014 Action Required",
+    "vector_verdicts": {
+      "image_password": "suspicious",
+      "links": "clean",
+      "pdf": "clean",
+      "text_language": "clean",
+      "detonation_behavior": "malicious"
+    }
+  },
+  {
+    "run_id": "e8d26295",
+    "timestamp": "2026-10-05 06:45:26",
+    "filename": "lure_link_only_1791182630.eml",
+    "verdict": "low_confidence",
+    "combined_score": 0.23,
+    "sender": "billing@fake-vendor-demo.test",
+    "subject": "Invoice / Document \u2014 Action Required",
+    "vector_verdicts": {
+      "image_password": "suspicious",
+      "links": "suspicious",
+      "pdf": "clean",
+      "text_language": "clean",
+      "detonation_behavior": "clean"
+    }
+  },
+  {
+    "run_id": "44a7476a",
+    "timestamp": "2026-10-05 06:51:21",
+    "filename": "lure_pdf_only_1791183032.eml",
+    "verdict": "malicious",
+    "combined_score": 0.95,
+    "sender": "billing@fake-vendor-demo.test",
+    "subject": "Invoice / Document \u2014 Action Required",
+    "vector_verdicts": {
+      "image_password": "malicious",
+      "links": "clean",
+      "pdf": "malicious",
+      "text_language": "clean",
+      "detonation_behavior": "clean"
+    }
+  },
+  {
+    "run_id": "8ee3f9ac",
+    "timestamp": "2026-10-05 07:10:30",
+    "filename": "lure_text_only_1791184188.eml",
+    "verdict": "low_confidence",
+    "combined_score": 0.16,
+    "sender": "billing@fake-vendor-demo.test",
+    "subject": "Invoice / Document \u2014 Action Required",
+    "vector_verdicts": {
+      "image_password": "suspicious",
+      "links": "clean",
+      "pdf": "clean",
+      "text_language": "clean",
+      "detonation_behavior": "clean"
+    }
+  },
+  {
+    "run_id": "98e7394b",
+    "timestamp": "2026-10-05 17:09:48",
+    "filename": "lure_link_only_1791220188.eml",
+    "verdict": "suspicious",
+    "combined_score": 0.38,
+    "sender": "billing@fake-vendor-demo.test",
+    "subject": "Invoice / Document \u2014 Action Required",
+    "vector_verdicts": {
+      "image_password": "suspicious",
+      "links": "suspicious",
+      "pdf": "clean",
+      "text_language": "clean",
+      "detonation_behavior": "clean"
+    }
+  },
+  {
+    "run_id": "fe83f4f7",
+    "timestamp": "2026-10-05 17:10:17",
+    "filename": "lure_pdf_only_1791220217.eml",
+    "verdict": "suspicious",
+    "combined_score": 0.39,
+    "sender": "billing@fake-vendor-demo.test",
+    "subject": "Invoice / Document \u2014 Action Required",
+    "vector_verdicts": {
+      "image_password": "suspicious",
+      "links": "clean",
+      "pdf": "malicious",
+      "text_language": "clean",
+      "detonation_behavior": "clean"
+    }
+  },
+  {
+    "run_id": "98a0b240",
+    "timestamp": "2026-10-05 17:10:32",
+    "filename": "lure_text_only_1791220232.eml",
+    "verdict": "benign",
+    "combined_score": 0.32,
+    "sender": "billing@fake-vendor-demo.test",
+    "subject": "Invoice / Document \u2014 Action Required",
+    "vector_verdicts": {
+      "image_password": "suspicious",
+      "links": "clean",
+      "pdf": "clean",
+      "text_language": "clean",
+      "detonation_behavior": "clean"
+    }
+  },
+  {
+    "run_id": "90f7b79d",
+    "timestamp": "2026-10-05 17:12:35",
+    "filename": "lure_combined_1791220242.eml",
+    "verdict": "malicious",
+    "combined_score": 0.95,
+    "sender": "billing@fake-vendor-demo.test",
+    "subject": "Invoice / Document \u2014 Action Required",
+    "vector_verdicts": {
+      "image_password": "suspicious",
+      "links": "suspicious",
+      "pdf": "malicious",
+      "text_language": "clean",
+      "detonation_behavior": "malicious"
+    }
+  },
+  {
+    "run_id": "8308c521",
+    "timestamp": "2026-10-05 17:14:51",
+    "filename": "lure_combined_1791220242.eml",
+    "verdict": "malicious",
+    "combined_score": 0.95,
+    "sender": "billing@fake-vendor-demo.test",
+    "subject": "Invoice / Document \u2014 Action Required",
+    "vector_verdicts": {
+      "image_password": "suspicious",
+      "links": "suspicious",
+      "pdf": "malicious",
+      "text_language": "clean",
+      "detonation_behavior": "malicious"
+    }
+  },
+  {
+    "run_id": "ed3fdd94",
+    "timestamp": "2026-10-06 09:14:50",
+    "filename": "lure_combined_1791277950.eml",
+    "verdict": "suspicious",
+    "combined_score": 0.34,
+    "sender": "billing@fake-vendor-demo.test",
+    "subject": "Invoice / Document \u2014 Action Required",
+    "vector_verdicts": {
+      "image_password": "suspicious",
+      "links": "suspicious",
+      "pdf": "malicious",
+      "text_language": "clean",
+      "detonation_behavior": "clean"
+    }
+  },
+  {
+    "run_id": "b80b5ca5",
+    "timestamp": "2026-10-06 09:48:29",
+    "filename": "lure_combined_1791277950.eml",
+    "verdict": "suspicious",
+    "combined_score": 0.34,
+    "sender": "billing@fake-vendor-demo.test",
+    "subject": "Invoice / Document \u2014 Action Required",
+    "vector_verdicts": {
+      "image_password": "suspicious",
+      "links": "suspicious",
+      "pdf": "malicious",
+      "text_language": "clean",
+      "detonation_behavior": "clean"
+    }
+  },
+  {
+    "run_id": "ef5a930e",
+    "timestamp": "2026-10-06 09:57:00",
+    "filename": "lure_combined_1791280514.eml",
+    "verdict": "malicious",
+    "combined_score": 0.95,
+    "sender": "billing@fake-vendor-demo.test",
+    "subject": "Invoice / Document \u2014 Action Required",
+    "vector_verdicts": {
+      "image_password": "malicious",
+      "links": "suspicious",
+      "pdf": "malicious",
+      "text_language": "clean",
+      "detonation_behavior": "malicious"
+    }
+  },
+  {
+    "run_id": "2d0fe486",
+    "timestamp": "2026-10-06 10:00:48",
+    "filename": "lure_link_only_1791280848.eml",
+    "verdict": "suspicious",
+    "combined_score": 0.38,
+    "sender": "billing@fake-vendor-demo.test",
+    "subject": "Invoice / Document \u2014 Action Required",
+    "vector_verdicts": {
+      "image_password": "suspicious",
+      "links": "suspicious",
+      "pdf": "clean",
+      "text_language": "clean",
+      "detonation_behavior": "clean"
+    }
+  },
+  {
+    "run_id": "d14eedad",
+    "timestamp": "2026-10-06 10:01:39",
+    "filename": "lure_pdf_only_1791280898.eml",
+    "verdict": "suspicious",
+    "combined_score": 0.39,
+    "sender": "billing@fake-vendor-demo.test",
+    "subject": "Invoice / Document \u2014 Action Required",
+    "vector_verdicts": {
+      "image_password": "suspicious",
+      "links": "clean",
+      "pdf": "malicious",
+      "text_language": "clean",
+      "detonation_behavior": "clean"
+    }
+  }
+]

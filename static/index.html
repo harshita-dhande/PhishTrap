@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PhishTrap — Autonomous Threat Ingestion Pipeline</title>
+<style>
+  /* ── Reset & Base ─────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #0d1117;
+    --surface:  #161b22;
+    --border:   #30363d;
+    --text:     #e6edf3;
+    --muted:    #8b949e;
+    --accent:   #58a6ff;
+    --red:      #f85149;
+    --orange:   #d29922;
+    --green:    #3fb950;
+    --purple:   #bc8cff;
+    --font:     "Courier New", Courier, monospace;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Header ───────────────────────────────────────────────────── */
+  header {
+    padding: 16px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo { font-size: 1.4rem; font-weight: bold; letter-spacing: 2px; }
+  .logo span { color: var(--red); }
+
+  .status-dot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.75rem;
+    color: var(--green);
+  }
+  .status-dot::before {
+    content: "";
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 6px var(--green);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* ── Navigation tabs ──────────────────────────────────────────── */
+  nav {
+    display: flex;
+    gap: 4px;
+    padding: 12px 32px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  nav button {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--muted);
+    font-family: var(--font);
+    font-size: 0.8rem;
+    padding: 8px 16px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  nav button.active { color: var(--accent); border-bottom-color: var(--accent); }
+  nav button:hover:not(.active) { color: var(--text); }
+
+  /* ── Main content ─────────────────────────────────────────────── */
+  main { flex: 1; padding: 32px; max-width: 1100px; width: 100%; margin: 0 auto; }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── Cards ────────────────────────────────────────────────────── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .card-title {
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  /* ── Screen 1: Email Simulator ────────────────────────────────── */
+  .drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    padding: 48px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    margin-bottom: 20px;
+  }
+  .drop-zone:hover, .drop-zone.drag-over {
+    border-color: var(--accent);
+    background: rgba(88,166,255,0.04);
+  }
+  .drop-zone svg { margin-bottom: 12px; }
+  .drop-zone p { color: var(--muted); font-size: 0.85rem; }
+  .drop-zone strong { color: var(--accent); }
+  #file-input { display: none; }
+
+  .btn-row { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  .btn {
+    font-family: var(--font);
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+  }
+  .btn-primary { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  .btn-primary:hover { background: #79b8ff; }
+  .btn-danger  { background: transparent; color: var(--red); border-color: var(--red); }
+  .btn-danger:hover { background: rgba(248,81,73,0.1); }
+  .btn-success { background: transparent; color: var(--green); border-color: var(--green); }
+  .btn-success:hover { background: rgba(63,185,80,0.1); }
+  .btn-purple  { background: transparent; color: var(--purple); border-color: var(--purple); }
+  .btn-purple:hover { background: rgba(188,140,255,0.1); }
+  .btn-muted   { background: transparent; color: var(--muted); border-color: var(--border); }
+  .btn-muted:hover { color: var(--text); border-color: var(--muted); }
+
+  /* ── Screen 2: Live Pipeline Stepper ─────────────────────────── */
+  .pipeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  .run-id-badge {
+    font-size: 0.7rem;
+    color: var(--muted);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+
+  .steps { display: flex; flex-direction: column; gap: 12px; }
+
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    transition: all 0.3s;
+  }
+  .step.running { border-color: var(--orange); background: rgba(210,153,34,0.04); }
+  .step.done    { border-color: var(--green);  background: rgba(63,185,80,0.04); }
+  .step.failed  { border-color: var(--red);    background: rgba(248,81,73,0.04); }
+  .step.skipped { border-color: var(--border); opacity: 0.5; }
+
+  .step-icon {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+    transition: all 0.3s;
+  }
+  .step.running .step-icon { border-color: var(--orange); color: var(--orange); animation: spin 1s linear infinite; }
+  .step.done    .step-icon { border-color: var(--green);  color: var(--green);  }
+  .step.failed  .step-icon { border-color: var(--red);    color: var(--red);    }
+  @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+  .step-content { flex: 1; }
+  .step-name { font-size: 0.8rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+  .step-detail { font-size: 0.72rem; color: var(--muted); word-break: break-all; }
+  .step-label { font-size: 0.65rem; letter-spacing: 1px; color: var(--muted); margin-left: auto; text-transform: uppercase; flex-shrink: 0; }
+
+  /* ── Screen 3: Report Dashboard ───────────────────────────────── */
+  .verdict-banner {
+    text-align: center;
+    padding: 32px;
+    border-radius: 8px;
+    border: 2px solid;
+    margin-bottom: 24px;
+  }
+  .verdict-banner.malicious { border-color: var(--red);    background: rgba(248,81,73,0.06); }
+  .verdict-banner.suspicious{ border-color: var(--orange); background: rgba(210,153,34,0.06); }
+  .verdict-banner.benign    { border-color: var(--green);  background: rgba(63,185,80,0.06); }
+  .verdict-banner.low_confidence { border-color: var(--muted); background: rgba(139,148,158,0.06); }
+
+  .verdict-label { font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .verdict-value { font-size: 2.5rem; font-weight: bold; letter-spacing: 4px; }
+  .verdict-banner.malicious  .verdict-value { color: var(--red); }
+  .verdict-banner.suspicious .verdict-value { color: var(--orange); }
+  .verdict-banner.benign     .verdict-value { color: var(--green); }
+  .verdict-banner.low_confidence .verdict-value { color: var(--muted); }
+
+  .score-bar-wrap { margin-top: 16px; background: var(--border); height: 6px; border-radius: 3px; width: 50%; margin: 16px auto 0; }
+  .score-bar      { height: 6px; border-radius: 3px; transition: width 1s ease; }
+  .malicious  .score-bar { background: var(--red); }
+  .suspicious .score-bar { background: var(--orange); }
+  .benign     .score-bar { background: var(--green); }
+  .low_confidence .score-bar { background: var(--muted); }
+
+  .score-pct { font-size: 0.75rem; color: var(--muted); margin-top: 8px; }
+
+  .mttd-badge {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 0.7rem;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 4px 12px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+  }
+
+  /* Vector grid */
+  .vector-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
+
+  .vector-card {
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    text-align: center;
+  }
+  .vector-card.malicious  { border-color: var(--red); }
+  .vector-card.suspicious { border-color: var(--orange); }
+  .vector-card.clean      { border-color: var(--green); }
+
+  .vector-name  { font-size: 0.65rem; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .vector-badge { font-size: 0.75rem; letter-spacing: 1px; font-weight: bold; }
+  .vector-card.malicious  .vector-badge { color: var(--red); }
+  .vector-card.suspicious .vector-badge { color: var(--orange); }
+  .vector-card.clean      .vector-badge { color: var(--green); }
+
+  /* Info rows */
+  .info-row { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 8px; font-size: 0.78rem; }
+  .info-label { color: var(--muted); min-width: 100px; flex-shrink: 0; }
+  .info-value { color: var(--text); word-break: break-all; }
+
+  /* Impact boxes */
+  .impact-box {
+    border-left: 3px solid var(--red);
+    padding: 12px 16px;
+    background: rgba(248,81,73,0.04);
+    border-radius: 0 6px 6px 0;
+    font-size: 0.78rem;
+    line-height: 1.7;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+  .impact-box.info { border-left-color: var(--accent); background: rgba(88,166,255,0.04); }
+
+  /* SHA box */
+  .sha-box {
+    font-size: 0.68rem;
+    color: var(--muted);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    border-radius: 4px;
+    word-break: break-all;
+    letter-spacing: 0.5px;
+  }
+
+  /* Summary */
+  .summary-text {
+    line-height: 1.7;
+    font-size: 0.82rem;
+    color: var(--text);
+    border-left: 3px solid var(--purple);
+    padding-left: 16px;
+  }
+
+  /* History table */
+  table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+  th { text-align: left; color: var(--muted); font-size: 0.65rem; letter-spacing: 1px; text-transform: uppercase; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text); }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    border: 1px solid;
+    text-transform: uppercase;
+  }
+  .badge.malicious   { color: var(--red);    border-color: var(--red); }
+  .badge.suspicious  { color: var(--orange); border-color: var(--orange); }
+  .badge.benign      { color: var(--green);  border-color: var(--green); }
+  .badge.low_confidence { color: var(--muted); border-color: var(--muted); }
+
+  /* Confidence/reasoning box */
+  .confidence-box {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+    background: var(--bg);
+  }
+  .confidence-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .confidence-pct { font-size: 1.4rem; font-weight: bold; }
+  .confidence-pct.high { color: var(--red); }
+  .confidence-pct.mid  { color: var(--orange); }
+  .confidence-pct.low  { color: var(--green); }
+  .reasoning-text { font-size: 0.75rem; color: var(--muted); font-style: italic; }
+
+  /* Escalation notice */
+  .escalation-notice {
+    text-align: center;
+    padding: 20px;
+    border: 1px dashed var(--orange);
+    border-radius: 8px;
+    color: var(--orange);
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+  }
+
+  /* Footer */
+  footer { padding: 16px 32px; border-top: 1px solid var(--border); font-size: 0.65rem; color: var(--muted); display: flex; justify-content: space-between; }
+</style>
+</head>
+<body>
+
+<!-- ── Header ─────────────────────────────────────────────────────────── -->
+<header>
+  <div class="logo">PHISH<span>TRAP</span></div>
+  <div style="font-size:0.7rem; color:var(--muted); letter-spacing:1px;">AUTONOMOUS THREAT INGESTION & DETONATION PIPELINE :: V2.0</div>
+  <div class="status-dot">SYSTEM ONLINE</div>
+</header>
+
+<!-- ── Navigation ─────────────────────────────────────────────────────── -->
+<nav>
+  <button class="active" onclick="switchScreen('ingest')">01 / Ingestion Node</button>
+  <button onclick="switchScreen('pipeline')">02 / Live Pipeline</button>
+  <button onclick="switchScreen('report')">03 / Threat Report</button>
+  <button onclick="switchScreen('history')">04 / History</button>
+</nav>
+
+<!-- ── Main ───────────────────────────────────────────────────────────── -->
+<main>
+
+  <!-- Screen 1: Ingestion -->
+  <div id="screen-ingest" class="screen active">
+    <div class="card">
+      <div class="card-title">Ingestion Node — Drop Raw Email Artifact</div>
+
+      <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+        <input type="file" id="file-input" accept=".eml" />
+        <svg width="40" height="40" fill="none" stroke="var(--muted)" stroke-width="1.5" viewBox="0 0 24 24">
+          <polyline points="16 16 12 12 8 16"></polyline>
+          <line x1="12" y1="12" x2="12" y2="21"></line>
+          <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path>
+        </svg>
+        <p><strong>Click to select</strong> or drag & drop a <strong>.eml</strong> file</p>
+        <p style="margin-top:6px; font-size:0.7rem;">Raw RFC 822 email format</p>
+      </div>
+
+      <div class="card-title" style="margin-top:8px;">Quick Launch</div>
+      <div class="btn-row">
+        <button class="btn btn-danger" onclick="runPreset('malicious')">
+          ⚠ Load Preset Attack (Combined)
+        </button>
+        <button class="btn btn-success" onclick="runPreset('benign')">
+          ✓ Load Clean Email (Control)
+        </button>
+        <button class="btn btn-purple" onclick="generateFresh('combined')">
+          ✦ Generate Fresh Attack
+        </button>
+      </div>
+
+      <div class="card-title" style="margin-top:20px;">Generate Single-Vector Attack</div>
+      <div class="btn-row">
+        <button class="btn btn-muted" onclick="generateFresh('image')">Image / Password Only</button>
+        <button class="btn btn-muted" onclick="generateFresh('link')">Malicious Link Only</button>
+        <button class="btn btn-muted" onclick="generateFresh('pdf')">Suspicious PDF Only</button>
+        <button class="btn btn-muted" onclick="generateFresh('text')">Phishing Language Only</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen 2: Live Pipeline Stepper -->
+  <div id="screen-pipeline" class="screen">
+    <div class="pipeline-header">
+      <div>
+        <div class="card-title" style="margin-bottom:4px;">Live Detection Pipeline</div>
+        <div style="font-size:0.75rem; color:var(--muted);">Real-time stage telemetry</div>
+      </div>
+      <div class="run-id-badge" id="run-id-badge">RUN ID: —</div>
+    </div>
+
+    <div class="steps" id="steps-container">
+      <!-- Steps rendered by JS -->
+    </div>
+
+    <div style="margin-top:20px; display:flex; gap:12px;">
+      <button class="btn btn-muted" onclick="switchScreen('ingest')" style="font-size:0.7rem;">← New Email</button>
+      <button class="btn btn-primary" id="view-report-btn" style="font-size:0.7rem; display:none;" onclick="switchScreen('report')">View Report →</button>
+    </div>
+  </div>
+
+  <!-- Screen 3: Threat Report -->
+  <div id="screen-report" class="screen">
+    <div id="report-container">
+      <div style="text-align:center; color:var(--muted); padding:60px 0; font-size:0.8rem; letter-spacing:1px;">
+        NO REPORT AVAILABLE — RUN THE PIPELINE FIRST
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen 4: History -->
+  <div id="screen-history" class="screen">
+    <div class="card">
+      <div class="card-title">Detection History — Last 10 Runs</div>
+      <div id="history-container">
+        <div style="color:var(--muted); font-size:0.8rem;">Loading...</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <span>PHISHTRAP v2.0 — AI-DRIVEN SOAR PIPELINE</span>
+  <span id="footer-time"></span>
+</footer>
+
+<!-- ── JavaScript ──────────────────────────────────────────────────────── -->
+<script>
+// ── State ──────────────────────────────────────────────────────────────
+let currentRunId   = null;
+let currentReport  = null;
+let pipelineStart  = null;
+let socket         = null;
+
+// Step definitions in display order
+const STEP_DEFS = [
+  { key: "ingest",       label: "Email Ingested",        icon: "✉" },
+  { key: "ocr",          label: "OCR — Image Scan",      icon: "◎" },
+  { key: "ai_extraction",label: "AI Password Extraction",icon: "◈" },
+  { key: "reputation",   label: "Sender Reputation",     icon: "⊙" },
+  { key: "link_analysis",label: "Link Analysis",         icon: "⇢" },
+  { key: "pdf_analysis", label: "PDF Scan",              icon: "▤" },
+  { key: "text_analysis",label: "Text Language Analysis",icon: "≡" },
+  { key: "unzip",        label: "Archive Decryption",    icon: "⎋" },
+  { key: "detonate",     label: "Sandbox Detonation",    icon: "⚡" },
+  { key: "report",       label: "Report Generated",      icon: "✦" },
+];
+
+const stepState = {};
+
+// ── Screen switching ────────────────────────────────────────────────────
+function switchScreen(name) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+  document.getElementById("screen-" + name).classList.add("active");
+  document.querySelectorAll("nav button")[["ingest","pipeline","report","history"].indexOf(name)].classList.add("active");
+  if (name === "history") loadHistory();
+}
+
+// ── File drop + upload ──────────────────────────────────────────────────
+const dropZone = document.getElementById("drop-zone");
+const fileInput = document.getElementById("file-input");
+
+dropZone.addEventListener("dragover", e => { e.preventDefault(); dropZone.classList.add("drag-over"); });
+dropZone.addEventListener("dragleave", ()=> dropZone.classList.remove("drag-over"));
+dropZone.addEventListener("drop", e => {
+  e.preventDefault();
+  dropZone.classList.remove("drag-over");
+  const file = e.dataTransfer.files[0];
+  if (file && file.name.endsWith(".eml")) uploadFile(file);
+  else alert("Please drop a .eml file.");
+});
+fileInput.addEventListener("change", () => {
+  if (fileInput.files[0]) uploadFile(fileInput.files[0]);
+});
+
+async function uploadFile(file) {
+  const form = new FormData();
+  form.append("file", file);
+  const res = await fetch("/upload-email", { method: "POST", body: form });
+  const { run_id } = await res.json();
+  startPipeline(run_id);
+}
+
+// ── Preset & generate buttons ────────────────────────────────────────────
+async function runPreset(type) {
+  const res = await fetch(`/preset/${type}`);
+  const { run_id } = await res.json();
+  startPipeline(run_id);
+}
+
+async function generateFresh(vector) {
+  const param = vector === "combined" ? "" : `?vector=${vector}`;
+  const res = await fetch(`/generate/lure${param}`);
+  if (!res.ok) { alert("Generation failed — make sure mock_payload_HARMLESS.exe is in ~/phishtrap/"); return; }
+  const { run_id } = await res.json();
+  startPipeline(run_id);
+}
+
+// ── Pipeline start ─────────────────────────────────────────────────────
+function startPipeline(runId) {
+  currentRunId  = runId;
+  pipelineStart = Date.now();
+
+  // Reset steps
+  STEP_DEFS.forEach(s => stepState[s.key] = "pending");
+  renderSteps();
+  document.getElementById("run-id-badge").textContent = `RUN ID: ${runId}`;
+  document.getElementById("view-report-btn").style.display = "none";
+  switchScreen("pipeline");
+
+  // Open WebSocket
+  if (socket) socket.close();
+  const wsProto = location.protocol === "https:" ? "wss" : "ws";
+  socket = new WebSocket(`${wsProto}://${location.host}/ws/${runId}`);
+
+  socket.onmessage = (event) => {
+    const msg = JSON.parse(event.data);
+
+    if (msg.type === "stage") {
+      stepState[msg.stage] = msg.status;
+      updateStep(msg.stage, msg.status, msg.detail || "");
+    }
+    else if (msg.type === "done") {
+      currentReport = msg.report;
+      renderReport(currentReport);
+      document.getElementById("view-report-btn").style.display = "inline-block";
+      socket.close();
+    }
+    else if (msg.type === "error") {
+      console.error("Pipeline error:", msg.message);
+    }
+  };
+}
+
+// ── Step rendering ─────────────────────────────────────────────────────
+function renderSteps() {
+  const container = document.getElementById("steps-container");
+  container.innerHTML = STEP_DEFS.map(s => `
+    <div class="step" id="step-${s.key}">
+      <div class="step-icon" id="icon-${s.key}">${s.icon}</div>
+      <div class="step-content">
+        <div class="step-name">${s.label}</div>
+        <div class="step-detail" id="detail-${s.key}">Waiting...</div>
+      </div>
+      <div class="step-label" id="label-${s.key}">PENDING</div>
+    </div>
+  `).join("");
+}
+
+function updateStep(key, status, detail) {
+  const el   = document.getElementById("step-" + key);
+  const lbl  = document.getElementById("label-" + key);
+  const det  = document.getElementById("detail-" + key);
+  const icon = document.getElementById("icon-" + key);
+  if (!el) return;
+
+  el.className   = `step ${status}`;
+  lbl.textContent = status.toUpperCase();
+  if (detail) det.textContent = detail;
+
+  const iconMap = { pending: STEP_DEFS.find(s=>s.key===key)?.icon, running:"↻", done:"✓", failed:"✗", skipped:"–" };
+  icon.textContent = iconMap[status] || "?";
+}
+
+// ── Report rendering ────────────────────────────────────────────────────
+function renderReport(r) {
+  const mttd   = ((Date.now() - pipelineStart) / 1000).toFixed(1);
+  const vv     = r.vector_verdicts || {};
+  const score  = (r.combined_score || 0) * 100;
+  const conf   = ((r.ai_extraction?.confidence || 0) * 100).toFixed(0);
+  const confClass = conf >= 70 ? "high" : conf >= 40 ? "mid" : "low";
+  const impactBox = r.impact_explainer ? `
+    <div class="card">
+      <div class="card-title">Impact Analysis — What Would Have Happened</div>
+      ${r.impact_explainer.why_password_matters ? `
+        <div class="card-title" style="margin-top:0; color:var(--text); font-size:0.7rem; letter-spacing:1px;">Why The Password Matters</div>
+        <div class="impact-box">${r.impact_explainer.why_password_matters}</div>
+      ` : ""}
+      ${r.impact_explainer.why_links_matter ? `
+        <div class="card-title" style="color:var(--text); font-size:0.7rem; letter-spacing:1px;">Why The Link Is Dangerous</div>
+        <div class="impact-box">${r.impact_explainer.why_links_matter}</div>
+      ` : ""}
+      ${r.impact_explainer.why_pdf_features_matter ? `
+        <div class="card-title" style="color:var(--text); font-size:0.7rem; letter-spacing:1px;">Why The PDF Is Dangerous</div>
+        <div class="impact-box">${r.impact_explainer.why_pdf_features_matter}</div>
+      ` : ""}
+      <div class="card-title" style="color:var(--text); font-size:0.7rem; letter-spacing:1px;">If A Real Person Had Opened This</div>
+      <div class="impact-box">${r.impact_explainer.if_a_real_person_had_opened_this}</div>
+    </div>
+  ` : "";
+
+  // Escalation notice for low confidence
+  const escalation = (r.combined_score < 0.3 && r.verdict !== "benign") ? `
+    <div class="escalation-notice">⚠ LOW CONFIDENCE — ESCALATED TO ANALYST REVIEW<br>
+    <span style="font-size:0.65rem;color:var(--muted);">System is uncertain. A human analyst should review this email.</span></div>
+  ` : "";
+
+  const behaviorRows = [
+    r.ai_extraction?.password_found ? `<tr><td>Password Hidden In Image</td><td>🔴 HIGH</td><td>Attacker hid the decryption key inside an image to bypass text-based filters</td></tr>` : "",
+    (r.link_analysis?.links_found > 0) ? `<tr><td>Malicious Link Detected</td><td>${r.vector_verdicts?.links === "malicious" ? "🔴 HIGH" : "🟡 MEDIUM"}</td><td>Email contains URLs with suspicious patterns (IP literal / URL shortener)</td></tr>` : "",
+    r.pdf_analysis?.suspicious_features?.length ? `<tr><td>Suspicious PDF Features</td><td>🔴 HIGH</td><td>${r.pdf_analysis.suspicious_features.join("; ")}</td></tr>` : "",
+    r.text_analysis?.urgency_hits?.length ? `<tr><td>Urgency Language</td><td>🟡 MEDIUM</td><td>Phrases detected: ${r.text_analysis.urgency_hits.join(", ")}</td></tr>` : "",
+    r.detonation?.status === "executed" ? `<tr><td>File Executed In Sandbox</td><td>🔴 HIGH</td><td>${r.detonation.behavior}</td></tr>` : "",
+  ].filter(Boolean).join("") || "<tr><td colspan='3' style='color:var(--muted)'>No behaviors detected</td></tr>";
+
+  document.getElementById("report-container").innerHTML = `
+    <!-- Verdict banner -->
+    <div class="verdict-banner ${r.verdict}">
+      <div class="verdict-label">Automated Threat Intelligence Report</div>
+      <div class="verdict-value">${r.verdict?.toUpperCase()}</div>
+      <div class="score-bar-wrap"><div class="score-bar" style="width:${score}%"></div></div>
+      <div class="score-pct">Combined Risk Score: ${score.toFixed(0)} / 100</div>
+      <div class="mttd-badge">⚡ Detected & remediated in ${mttd}s — average human SOC triage: 15–20 min</div>
+    </div>
+
+    ${escalation}
+
+    <!-- Email metadata -->
+    <div class="card">
+      <div class="card-title">Email Metadata</div>
+      <div class="info-row"><span class="info-label">Sender</span><span class="info-value">${r.sender || "—"}</span></div>
+      <div class="info-row"><span class="info-label">Subject</span><span class="info-value">${r.subject || "—"}</span></div>
+      <div class="info-row"><span class="info-label">Sender Domain</span><span class="info-value">${r.reputation?.domain || "—"} — ${r.reputation?.reason || ""}</span></div>
+    </div>
+
+    <!-- Per-vector verdicts -->
+    <div class="card">
+      <div class="card-title">Detection Vectors — Individual Results</div>
+      <div class="vector-grid">
+        <div class="vector-card ${vv.image_password || 'clean'}">
+          <div class="vector-name">Image / Password</div>
+          <div class="vector-badge">${(vv.image_password || "clean").toUpperCase()}</div>
+        </div>
+        <div class="vector-card ${vv.links || 'clean'}">
+          <div class="vector-name">Malicious Links</div>
+          <div class="vector-badge">${(vv.links || "clean").toUpperCase()}</div>
+        </div>
+        <div class="vector-card ${vv.pdf || 'clean'}">
+          <div class="vector-name">PDF Analysis</div>
+          <div class="vector-badge">${(vv.pdf || "clean").toUpperCase()}</div>
+        </div>
+        <div class="vector-card ${vv.text_language || 'clean'}">
+          <div class="vector-name">Text Language</div>
+          <div class="vector-badge">${(vv.text_language || "clean").toUpperCase()}</div>
+        </div>
+        <div class="vector-card ${vv.detonation_behavior || 'clean'}">
+          <div class="vector-name">Sandbox Detonation</div>
+          <div class="vector-badge">${(vv.detonation_behavior || "clean").toUpperCase()}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI confidence & reasoning -->
+    <div class="card">
+      <div class="card-title">AI Extraction — Confidence & Reasoning</div>
+      <div class="confidence-box">
+        <div class="confidence-row">
+          <div class="confidence-pct ${confClass}">${conf}%</div>
+          <div>
+            <div style="font-size:0.75rem; margin-bottom:4px;">Extraction Confidence</div>
+            <div class="reasoning-text">"${r.ai_extraction?.reasoning || "No reasoning available"}"</div>
+          </div>
+        </div>
+        ${r.ocr_text ? `<div class="info-row" style="margin-top:12px;"><span class="info-label">OCR Text</span><span class="info-value">${r.ocr_text}</span></div>` : ""}
+        ${r.ai_extraction?.value ? `<div class="info-row"><span class="info-label">Extracted Key</span><span class="info-value" style="color:var(--red);">${r.ai_extraction.value}</span></div>` : ""}
+      </div>
+    </div>
+
+    <!-- Behavior table -->
+    <div class="card">
+      <div class="card-title">Detected Behaviors</div>
+      <table>
+        <thead><tr><th>Activity</th><th>Risk Level</th><th>Explanation</th></tr></thead>
+        <tbody>${behaviorRows}</tbody>
+      </table>
+    </div>
+
+    <!-- Plain English summary -->
+    <div class="card">
+      <div class="card-title">Plain-English Summary (AI Generated)</div>
+      <div class="summary-text">${r.plain_english_summary || "No summary available."}</div>
+    </div>
+
+    ${impactBox}
+
+    <!-- SHA-256 -->
+    ${r.payload_sha256 ? `
+    <div class="card">
+      <div class="card-title">Payload Hash (SHA-256)</div>
+      <div class="sha-box">${r.payload_sha256}</div>
+    </div>
+    ` : ""}
+
+    <div style="display:flex; gap:12px; margin-top:8px;">
+      <button class="btn btn-muted" onclick="switchScreen('ingest')" style="font-size:0.7rem;">← Analyze Another</button>
+      <button class="btn btn-muted" onclick="switchScreen('history')" style="font-size:0.7rem;">View History</button>
+    </div>
+  `;
+}
+
+// ── History ─────────────────────────────────────────────────────────────
+async function loadHistory() {
+  const res  = await fetch("/history");
+  const data = await res.json();
+  const runs = data.runs || [];
+  const container = document.getElementById("history-container");
+  if (!runs.length) {
+    container.innerHTML = `<div style="color:var(--muted); font-size:0.8rem;">No runs yet.</div>`;
+    return;
+  }
+  container.innerHTML = `
+    <table>
+      <thead><tr><th>Time</th><th>File</th><th>Sender</th><th>Verdict</th><th>Score</th></tr></thead>
+      <tbody>${runs.map(r => `
+        <tr>
+          <td>${r.timestamp}</td>
+          <td style="color:var(--muted)">${r.filename || "—"}</td>
+          <td style="color:var(--muted)">${r.sender || "—"}</td>
+          <td><span class="badge ${r.verdict}">${r.verdict?.toUpperCase()}</span></td>
+          <td>${((r.combined_score||0)*100).toFixed(0)}%</td>
+        </tr>
+      `).join("")}</tbody>
+    </table>
+  `;
+}
+
+// ── Footer clock ─────────────────────────────────────────────────────────
+setInterval(() => {
+  document.getElementById("footer-time").textContent = new Date().toLocaleTimeString();
+}, 1000);
+document.getElementById("footer-time").textContent = new Date().toLocaleTimeString();
+</script>
+</body>
+</html>

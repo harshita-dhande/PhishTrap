@@ -1,0 +1,23 @@
+# macOS
+.DS_Store
+
+# Large binary files
+*.exe
+*.zip
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.venv/
+env/
+venv/
+
+# Uploads and extracted content
+uploads/
+extracted/
+
+# Demo artifacts (generated)
+demo_artifacts/

@@ -1,0 +1,11 @@
+{
+  "fake-vendor-demo.test": {
+    "count": 2
+  },
+  "teammate@internal-company-demo.test": {
+    "count": 6
+  },
+  "billing@fake-vendor-demo.test": {
+    "count": 129
+  }
+}
