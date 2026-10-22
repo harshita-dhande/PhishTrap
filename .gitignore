@@ -21,3 +21,11 @@ extracted/
 
 # Demo artifacts (generated)
 demo_artifacts/
+
+# Gmail API OAuth2 credentials (NEVER commit these)
+credentials.json
+token.json
+gmail_seen.json
+.phishtrap.pids
+reports/
+*.log

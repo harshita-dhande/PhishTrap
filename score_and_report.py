@@ -101,7 +101,7 @@ def build_report(
     # alone", "link detection alone", etc. as well as the combined result.
     vector_verdicts = {
         "image_password": "malicious" if (ai_confidence >= 0.6 and ai_result.get("password_found")) else
-                           ("suspicious" if ai_confidence >= 0.3 else "clean"),
+                           ("suspicious" if (ai_confidence >= 0.3 and ai_result.get("password_found")) else "clean"),
         "links": "malicious" if link_risk >= 0.6 else ("suspicious" if link_risk >= 0.3 else "clean"),
         "pdf": "malicious" if pdf_risk >= 0.6 else ("suspicious" if pdf_risk >= 0.3 else "clean"),
         "text_language": "suspicious" if text_risk >= 0.3 else "clean",
@@ -120,12 +120,25 @@ def build_report(
     )
 
     # --- CRITICAL THREAT OVERRIDE ---
-    # Prevents score dilution. If a live payload drops, or a hidden password is found,
-    # the threat is escalated immediately, regardless of how polite the email text was.
+    # Prevents score dilution across vectors. If ANY vector detects a high threat
+    # (e.g. raw IP link, drop payload, or password trick), escalate immediately.
     if vector_verdicts.get("detonation_behavior") == "malicious" or vector_verdicts.get("image_password") == "malicious":
         combined_score = max(combined_score, 0.95)
+    elif vector_verdicts.get("links") == "malicious":
+        combined_score = max(combined_score, 0.85)
+    elif vector_verdicts.get("pdf") == "malicious":
+        combined_score = max(combined_score, 0.85)
+    elif vector_verdicts.get("links") == "suspicious":
+        combined_score = max(combined_score, 0.55)
+    elif vector_verdicts.get("text_language") == "suspicious":
+        combined_score = max(combined_score, 0.45)
 
-    any_content_flag = ai_result.get("password_found") or link_result["links_found"] > 0 or parsed.get("pdf") is not None
+    # Only consider content vectors flagged if they actually have a risk score >= 0.3
+    any_content_flag = (
+        ai_result.get("password_found")
+        or link_result.get("highest_risk", 0.0) >= 0.3
+        or pdf_result.get("risk_score", 0.0) >= 0.3
+    )
 
     if not any_content_flag and text_risk < 0.3:
         verdict = "benign"
@@ -134,7 +147,7 @@ def build_report(
     elif combined_score >= 0.3:
         verdict = "suspicious"
     else:
-        verdict = "low_confidence"
+        verdict = "benign" if not any_content_flag else "suspicious"
 
     payload_hash = _sha256_of_file(unzip_result.get("extracted_path"))
 

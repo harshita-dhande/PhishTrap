@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "PhishTrap Gmail Bridge",
+  "version": "1.0.0",
+  "description": "Seamlessly link Gmail labels and emails directly into PhishTrap threat reports.",
+  "permissions": [],
+  "host_permissions": ["https://mail.google.com/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://mail.google.com/*"],
+      "js": ["content.js"],
+      "css": ["style.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "Open PhishTrap Dashboard"
+  }
+}

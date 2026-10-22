@@ -366,5 +366,323 @@
       "text_language": "clean",
       "detonation_behavior": "clean"
     }
+  },
+  {
+    "run_id": "c064ada9",
+    "timestamp": "2026-10-21 10:18:41",
+    "filename": "benign_1792558060.eml",
+    "verdict": "benign",
+    "combined_score": 0.3,
+    "sender": "teammate@internal-company-demo.test",
+    "subject": "Quick update",
+    "vector_verdicts": {
+      "image_password": "suspicious",
+      "links": "clean",
+      "pdf": "clean",
+      "text_language": "clean",
+      "detonation_behavior": "clean"
+    }
+  },
+  {
+    "run_id": "6b7b1c61",
+    "timestamp": "2026-10-21 10:18:53",
+    "filename": "lure_combined_1792558084.eml",
+    "verdict": "malicious",
+    "combined_score": 0.95,
+    "sender": "billing@fake-vendor-demo.test",
+    "subject": "Invoice / Document \u2014 Action Required",
+    "vector_verdicts": {
+      "image_password": "malicious",
+      "links": "suspicious",
+      "pdf": "malicious",
+      "text_language": "clean",
+      "detonation_behavior": "clean"
+    }
+  },
+  {
+    "run_id": "g_1a15e82d",
+    "message_id": "1a15e82dccc99c3e",
+    "timestamp": "2026-10-21 18:29:48",
+    "filename": "gmail_1a15e82d.eml",
+    "sender": "Harshita Dhande <stdsx129harshitad@gmail.com>",
+    "subject": "",
+    "verdict": "benign",
+    "combined_score": 0.08,
+    "vector_verdicts": {
+      "image_password": "clean",
+      "links": "clean",
+      "pdf": "clean",
+      "text_language": "clean",
+      "detonation_behavior": "clean"
+    },
+    "source": "gmail"
+  },
+  {
+    "run_id": "g_1a15cde6",
+    "message_id": "1a15cde6f116f2af",
+    "timestamp": "2026-10-21 18:33:07",
+    "filename": "gmail_1a15cde6.eml",
+    "sender": "Google <no-reply@accounts.google.com>",
+    "subject": "Security alert",
+    "verdict": "low_confidence",
+    "combined_score": 0.08,
+    "vector_verdicts": {
+      "image_password": "clean",
+      "links": "clean",
+      "pdf": "clean",
+      "text_language": "clean",
+      "detonation_behavior": "clean"
+    },
+    "source": "gmail"
+  },
+  {
+    "run_id": "g_1a15e978",
+    "message_id": "1a15e9786627c153",
+    "timestamp": "2026-10-21 18:45:51",
+    "filename": "gmail_1a15e978.eml",
+    "sender": "Harshita Dhande <stdsx129harshitad@gmail.com>",
+    "subject": "",
+    "verdict": "low_confidence",
+    "combined_score": 0.14,
+    "vector_verdicts": {
+      "image_password": "clean",
+      "links": "suspicious",
+      "pdf": "clean",
+      "text_language": "clean",
+      "detonation_behavior": "clean"
+    },
+    "source": "gmail"
+  },
+  {
+    "run_id": "g_1a15e978",
+    "message_id": "1a15e9786627c153",
+    "timestamp": "2026-10-21 18:54:06",
+    "filename": "gmail_1a15e978.eml",
+    "sender": "Harshita Dhande <stdsx129harshitad@gmail.com>",
+    "subject": "",
+    "verdict": "malicious",
+    "combined_score": 0.85,
+    "vector_verdicts": {
+      "image_password": "clean",
+      "links": "malicious",
+      "pdf": "clean",
+      "text_language": "suspicious",
+      "detonation_behavior": "clean"
+    },
+    "source": "gmail"
+  },
+  {
+    "run_id": "g_1a15e978",
+    "message_id": "1a15e9786627c153",
+    "timestamp": "2026-10-21 19:05:33",
+    "filename": "gmail_1a15e978.eml",
+    "sender": "Harshita Dhande <stdsx129harshitad@gmail.com>",
+    "subject": "",
+    "verdict": "malicious",
+    "combined_score": 0.85,
+    "vector_verdicts": {
+      "image_password": "clean",
+      "links": "malicious",
+      "pdf": "clean",
+      "text_language": "suspicious",
+      "detonation_behavior": "clean"
+    },
+    "source": "gmail"
+  },
+  {
+    "run_id": "g_1a15e82d",
+    "message_id": "1a15e82dccc99c3e",
+    "timestamp": "2026-10-21 19:05:36",
+    "filename": "gmail_1a15e82d.eml",
+    "sender": "Harshita Dhande <stdsx129harshitad@gmail.com>",
+    "subject": "",
+    "verdict": "benign",
+    "combined_score": 0.0,
+    "vector_verdicts": {
+      "image_password": "clean",
+      "links": "clean",
+      "pdf": "clean",
+      "text_language": "clean",
+      "detonation_behavior": "clean"
+    },
+    "source": "gmail"
+  },
+  {
+    "run_id": "g_1a15ced6",
+    "message_id": "1a15ced624217dd2",
+    "timestamp": "2026-10-21 19:17:32",
+    "filename": "gmail_1a15ced6.eml",
+    "sender": "Google <no-reply@google.com>",
+    "subject": "\u2705 Shyamrao, review your Google Account settings for your new account",
+    "verdict": "benign",
+    "combined_score": 0.02,
+    "vector_verdicts": {
+      "image_password": "clean",
+      "links": "clean",
+      "pdf": "clean",
+      "text_language": "clean",
+      "detonation_behavior": "clean"
+    },
+    "source": "gmail"
+  },
+  {
+    "run_id": "g_1a15cded",
+    "message_id": "1a15cded1ddb339e",
+    "timestamp": "2026-10-21 19:17:36",
+    "filename": "gmail_1a15cded.eml",
+    "sender": "Google <no-reply@google.com>",
+    "subject": "Finish setting up your new Google Account on your iPhone",
+    "verdict": "benign",
+    "combined_score": 0.02,
+    "vector_verdicts": {
+      "image_password": "clean",
+      "links": "clean",
+      "pdf": "clean",
+      "text_language": "clean",
+      "detonation_behavior": "clean"
+    },
+    "source": "gmail"
+  },
+  {
+    "run_id": "g_1a15ce53",
+    "message_id": "1a15ce5360115f6e",
+    "timestamp": "2026-10-21 19:17:40",
+    "filename": "gmail_1a15ce53.eml",
+    "sender": "Google <no-reply@accounts.google.com>",
+    "subject": "You've sent stdsx129harshitad@gmail.com a recovery contact request",
+    "verdict": "suspicious",
+    "combined_score": 0.45,
+    "vector_verdicts": {
+      "image_password": "clean",
+      "links": "clean",
+      "pdf": "clean",
+      "text_language": "suspicious",
+      "detonation_behavior": "clean"
+    },
+    "source": "gmail"
+  },
+  {
+    "run_id": "g_1a15cde6",
+    "message_id": "1a15cde6f116f2af",
+    "timestamp": "2026-10-21 19:17:43",
+    "filename": "gmail_1a15cde6.eml",
+    "sender": "Google <no-reply@accounts.google.com>",
+    "subject": "Security alert",
+    "verdict": "benign",
+    "combined_score": 0.02,
+    "vector_verdicts": {
+      "image_password": "clean",
+      "links": "clean",
+      "pdf": "clean",
+      "text_language": "clean",
+      "detonation_behavior": "clean"
+    },
+    "source": "gmail"
+  },
+  {
+    "run_id": "g_1a15e82d",
+    "message_id": "1a15e82dccc99c3e",
+    "timestamp": "2026-10-21 19:17:47",
+    "filename": "gmail_1a15e82d.eml",
+    "sender": "Harshita Dhande <stdsx129harshitad@gmail.com>",
+    "subject": "",
+    "verdict": "benign",
+    "combined_score": 0.0,
+    "vector_verdicts": {
+      "image_password": "clean",
+      "links": "clean",
+      "pdf": "clean",
+      "text_language": "clean",
+      "detonation_behavior": "clean"
+    },
+    "source": "gmail"
+  },
+  {
+    "run_id": "g_1a15e978",
+    "message_id": "1a15e9786627c153",
+    "timestamp": "2026-10-21 19:17:50",
+    "filename": "gmail_1a15e978.eml",
+    "sender": "Harshita Dhande <stdsx129harshitad@gmail.com>",
+    "subject": "",
+    "verdict": "malicious",
+    "combined_score": 0.85,
+    "vector_verdicts": {
+      "image_password": "clean",
+      "links": "malicious",
+      "pdf": "clean",
+      "text_language": "suspicious",
+      "detonation_behavior": "clean"
+    },
+    "source": "gmail"
+  },
+  {
+    "run_id": "9ee4bf11",
+    "timestamp": "2026-10-21 19:30:32",
+    "filename": "lure_combined_1792558084.eml",
+    "verdict": "malicious",
+    "combined_score": 0.95,
+    "sender": "billing@fake-vendor-demo.test",
+    "subject": "Invoice / Document \u2014 Action Required",
+    "vector_verdicts": {
+      "image_password": "malicious",
+      "links": "malicious",
+      "pdf": "malicious",
+      "text_language": "suspicious",
+      "detonation_behavior": "clean"
+    }
+  },
+  {
+    "run_id": "g_1a15f44d",
+    "message_id": "1a15f44d77516285",
+    "timestamp": "2026-10-21 22:00:49",
+    "filename": "gmail_1a15f44d.eml",
+    "sender": "Harshita Dhande <stdsx129harshitad@gmail.com>",
+    "subject": "",
+    "verdict": "malicious",
+    "combined_score": 0.95,
+    "vector_verdicts": {
+      "image_password": "malicious",
+      "links": "malicious",
+      "pdf": "clean",
+      "text_language": "suspicious",
+      "detonation_behavior": "clean"
+    },
+    "source": "gmail"
+  },
+  {
+    "run_id": "g_1a15f509",
+    "message_id": "1a15f5094d723260",
+    "timestamp": "2026-10-21 22:04:47",
+    "filename": "gmail_1a15f509.eml",
+    "sender": "Harshita Dhande <stdsx129harshitad@gmail.com>",
+    "subject": "",
+    "verdict": "malicious",
+    "combined_score": 0.85,
+    "vector_verdicts": {
+      "image_password": "suspicious",
+      "links": "malicious",
+      "pdf": "clean",
+      "text_language": "suspicious",
+      "detonation_behavior": "clean"
+    },
+    "source": "gmail"
+  },
+  {
+    "run_id": "g_1a161b5c",
+    "message_id": "1a161b5c1e3ef267",
+    "timestamp": "2026-10-22 09:14:47",
+    "filename": "gmail_1a161b5c.eml",
+    "sender": "Harshita Dhande <stdsx129harshitad@gmail.com>",
+    "subject": "",
+    "verdict": "malicious",
+    "combined_score": 0.95,
+    "vector_verdicts": {
+      "image_password": "malicious",
+      "links": "malicious",
+      "pdf": "clean",
+      "text_language": "suspicious",
+      "detonation_behavior": "clean"
+    },
+    "source": "gmail"
   }
 ]

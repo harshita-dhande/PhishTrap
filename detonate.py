@@ -18,6 +18,16 @@ def detonate(exe_path: str,
              agent_url: str = WINDOWS_AGENT_URL,
              retries: int = 2,
              timeout: int = 40) -> dict:          # was 20, now 35
+    try:
+        from config import DISABLE_DETONATION
+        if DISABLE_DETONATION:
+            return {
+                "status": "skipped",
+                "behavior": "detonation skipped (local Mac safe mode - no payload executed)"
+            }
+    except Exception:
+        pass
+
     last_error = None
     for attempt in range(1, retries + 1):
         try:

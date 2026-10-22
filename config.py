@@ -3,9 +3,15 @@ Shared configuration for the PhishTrap pipeline.
 Edit these values to match your VM setup.
 """
 
-# --- Ollama (running on the Ubuntu Controller VM) ---
+# --- Ollama (running locally on Mac / Ubuntu Controller) ---
 OLLAMA_URL = "http://localhost:11434/api/generate"
-OLLAMA_MODEL = "phi3"
+# On this Mac, llama3 is installed and running. If on Ubuntu VM, change to phi3 or desired model.
+OLLAMA_MODEL = "llama3:latest"
+
+# --- Safe Local Testing (Bypass VM Sandbox Detonation) ---
+# When True, detonate() will safely skip calling the Windows VM sandbox.
+# Absolutely NO payload is executed and NO compromise files are dropped on your Mac.
+DISABLE_DETONATION = True
 
 # --- Windows Victim VM execution agent ---
 # Replace with the actual IP of your Windows VM (find via `ipconfig` on Windows)

@@ -62,7 +62,7 @@ def run_pipeline(eml_path: str, on_stage=None) -> dict:
     ai_result = {
         "password_found": False,
         "value": None,
-        "confidence": 1.0,
+        "confidence": 0.0,
         "reasoning": "Skipped: No image or zip found."
     }
 

@@ -365,6 +365,7 @@
   <button onclick="switchScreen('pipeline')">02 / Live Pipeline</button>
   <button onclick="switchScreen('report')">03 / Threat Report</button>
   <button onclick="switchScreen('history')">04 / History</button>
+  <button onclick="switchScreen('gmail')">05 / Gmail Live Feed</button>
 </nav>
 
 <!-- ── Main ───────────────────────────────────────────────────────────── -->
@@ -441,9 +442,25 @@
   <!-- Screen 4: History -->
   <div id="screen-history" class="screen">
     <div class="card">
-      <div class="card-title">Detection History — Last 10 Runs</div>
+      <div class="card-title">Detection History — All Runs</div>
       <div id="history-container">
         <div style="color:var(--muted); font-size:0.8rem;">Loading...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen 5: Gmail Live Feed -->
+  <div id="screen-gmail" class="screen">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <div class="card-title" style="margin-bottom:0;">Live Gmail Ingestion Monitor</div>
+        <button class="btn btn-muted" onclick="loadGmailFeed()" style="font-size:0.7rem;">↻ Refresh</button>
+      </div>
+      <div style="font-size:0.75rem; color:var(--muted); margin-bottom:16px;">
+        Emails automatically scanned & labeled from Gmail. Click any email row or button to view its detailed threat intelligence report.
+      </div>
+      <div id="gmail-feed-container">
+        <div style="color:var(--muted); font-size:0.8rem;">Loading Gmail scans...</div>
       </div>
     </div>
   </div>
@@ -483,9 +500,15 @@ const stepState = {};
 function switchScreen(name) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
-  document.getElementById("screen-" + name).classList.add("active");
-  document.querySelectorAll("nav button")[["ingest","pipeline","report","history"].indexOf(name)].classList.add("active");
+  const screenEl = document.getElementById("screen-" + name);
+  if (screenEl) screenEl.classList.add("active");
+  const tabNames = ["ingest","pipeline","report","history","gmail"];
+  const idx = tabNames.indexOf(name);
+  if (idx !== -1 && document.querySelectorAll("nav button")[idx]) {
+    document.querySelectorAll("nav button")[idx].classList.add("active");
+  }
   if (name === "history") loadHistory();
+  if (name === "gmail") loadGmailFeed();
 }
 
 // ── File drop + upload ──────────────────────────────────────────────────
@@ -730,6 +753,31 @@ function renderReport(r) {
   `;
 }
 
+function escapeHtml(text) {
+  if (!text) return "";
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// ── Report Loader by ID ─────────────────────────────────────────────────
+async function loadReportById(runId) {
+  try {
+    const res = await fetch(`/api/report/${runId}`);
+    if (!res.ok) {
+      alert("Report not found for ID: " + runId);
+      return;
+    }
+    const report = await res.json();
+    currentReport = report;
+    renderReport(report);
+    switchScreen("report");
+  } catch (err) {
+    console.error("Error loading report:", err);
+    alert("Could not load report: " + err.message);
+  }
+}
+
 // ── History ─────────────────────────────────────────────────────────────
 async function loadHistory() {
   const res  = await fetch("/history");
@@ -742,19 +790,68 @@ async function loadHistory() {
   }
   container.innerHTML = `
     <table>
-      <thead><tr><th>Time</th><th>File</th><th>Sender</th><th>Verdict</th><th>Score</th></tr></thead>
+      <thead><tr><th>Time</th><th>File / Source</th><th>Sender</th><th>Verdict</th><th>Score</th><th>Action</th></tr></thead>
       <tbody>${runs.map(r => `
-        <tr>
+        <tr style="cursor:pointer;" onclick="loadReportById('${r.run_id}')">
           <td>${r.timestamp}</td>
-          <td style="color:var(--muted)">${r.filename || "—"}</td>
-          <td style="color:var(--muted)">${r.sender || "—"}</td>
+          <td style="color:var(--muted)">${r.source === "gmail" ? "✉ Gmail" : (r.filename || "—")}</td>
+          <td style="color:var(--muted)">${escapeHtml(r.sender || "—")}</td>
           <td><span class="badge ${r.verdict}">${r.verdict?.toUpperCase()}</span></td>
           <td>${((r.combined_score||0)*100).toFixed(0)}%</td>
+          <td>
+            <button class="btn btn-primary" style="padding:4px 10px; font-size:0.65rem;" onclick="event.stopPropagation(); loadReportById('${r.run_id}')">View Report →</button>
+          </td>
         </tr>
       `).join("")}</tbody>
     </table>
   `;
 }
+
+// ── Gmail Feed ──────────────────────────────────────────────────────────
+async function loadGmailFeed() {
+  const container = document.getElementById("gmail-feed-container");
+  container.innerHTML = `<div style="color:var(--muted); font-size:0.8rem;">Loading Gmail scans...</div>`;
+  try {
+    const res = await fetch("/api/gmail-feed");
+    const data = await res.json();
+    const runs = data.gmail_runs || [];
+    if (!runs.length) {
+      container.innerHTML = `<div style="color:var(--muted); font-size:0.8rem; padding:20px 0;">No Gmail emails scanned yet. The Gmail watcher scans incoming emails automatically.</div>`;
+      return;
+    }
+    container.innerHTML = `
+      <table>
+        <thead><tr><th>Time</th><th>Sender</th><th>Subject</th><th>Verdict</th><th>Score</th><th>Action</th></tr></thead>
+        <tbody>${runs.map(r => `
+          <tr style="cursor:pointer;" onclick="loadReportById('${r.run_id}')">
+            <td>${r.timestamp}</td>
+            <td style="color:var(--text); font-weight:bold;">${escapeHtml(r.sender || "—")}</td>
+            <td style="color:var(--muted);">${escapeHtml(r.subject || "(no subject)")}</td>
+            <td><span class="badge ${r.verdict}">${r.verdict?.toUpperCase()}</span></td>
+            <td>${((r.combined_score||0)*100).toFixed(0)}%</td>
+            <td>
+              <button class="btn btn-primary" style="padding:4px 10px; font-size:0.65rem;" onclick="event.stopPropagation(); loadReportById('${r.run_id}')">View Report →</button>
+            </td>
+          </tr>
+        `).join("")}</tbody>
+      </table>
+    `;
+  } catch (err) {
+    container.innerHTML = `<div style="color:var(--red); font-size:0.8rem;">Error loading Gmail feed: ${err.message}</div>`;
+  }
+}
+
+// ── On load: check URL query params for direct report link ───────────────
+window.addEventListener("DOMContentLoaded", () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const targetId = urlParams.get("run") || urlParams.get("msg");
+  const tab = urlParams.get("tab");
+  if (targetId) {
+    loadReportById(targetId);
+  } else if (tab) {
+    switchScreen(tab);
+  }
+});
 
 // ── Footer clock ─────────────────────────────────────────────────────────
 setInterval(() => {

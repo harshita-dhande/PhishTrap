@@ -16,21 +16,34 @@ _reader = None  # lazy-loaded, EasyOCR init is slow
 def _get_reader():
     global _reader
     if _reader is None:
+        import ssl
+        try:
+            ssl._create_default_https_context = ssl._create_unverified_context
+        except Exception:
+            pass
         import easyocr
         _reader = easyocr.Reader(["en"], gpu=False)
     return _reader
 
 
-def run_ocr(image_path: str, retries: int = 1) -> str:
+def run_ocr(image_input, retries: int = 1) -> str:
     """
     Returns extracted text as a single string. Retries once on failure
     since OCR occasionally chokes on the "weird" (blurred/compressed) demo images.
+    Supports both file paths and raw image bytes.
     """
     last_error = None
     for attempt in range(retries + 1):
         try:
             reader = _get_reader()
-            results = reader.readtext(image_path, detail=0)
+            target = image_input
+            if isinstance(image_input, (bytes, bytearray)):
+                import io
+                from PIL import Image
+                import numpy as np
+                img = Image.open(io.BytesIO(image_input)).convert("RGB")
+                target = np.array(img)
+            results = reader.readtext(target, detail=0)
             return " ".join(results).strip()
         except Exception as e:
             last_error = e

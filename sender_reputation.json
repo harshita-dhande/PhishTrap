@@ -3,9 +3,18 @@
     "count": 2
   },
   "teammate@internal-company-demo.test": {
-    "count": 6
+    "count": 8
   },
   "billing@fake-vendor-demo.test": {
-    "count": 129
+    "count": 132
+  },
+  "Google <no-reply@google.com>": {
+    "count": 8
+  },
+  "Google <no-reply@accounts.google.com>": {
+    "count": 6
+  },
+  "Harshita Dhande <stdsx129harshitad@gmail.com>": {
+    "count": 12
   }
 }

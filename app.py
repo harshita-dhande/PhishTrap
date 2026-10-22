@@ -49,8 +49,31 @@ def _save_history():
         pass
 
 
-def _add_to_history(run_id: str, report: dict, filename: str):
-    _history.append({
+REPORTS_DIR = "reports"
+os.makedirs(REPORTS_DIR, exist_ok=True)
+
+
+def _save_full_report(run_id: str, report: dict, message_id: str = None):
+    try:
+        os.makedirs(REPORTS_DIR, exist_ok=True)
+        report_copy = dict(report)
+        report_copy["run_id"] = run_id
+        if message_id:
+            report_copy["message_id"] = message_id
+        path = os.path.join(REPORTS_DIR, f"{run_id}.json")
+        with open(path, "w") as f:
+            json.dump(report_copy, f, indent=2)
+        if message_id:
+            msg_path = os.path.join(REPORTS_DIR, f"msg_{message_id}.json")
+            with open(msg_path, "w") as f:
+                json.dump(report_copy, f, indent=2)
+    except Exception as e:
+        print(f"[app] Error saving full report: {e}")
+
+
+def _add_to_history(run_id: str, report: dict, filename: str, message_id: str = None):
+    _save_full_report(run_id, report, message_id=message_id)
+    entry = {
         "run_id":         run_id,
         "timestamp":      time.strftime("%Y-%m-%d %H:%M:%S"),
         "filename":       filename,
@@ -59,7 +82,11 @@ def _add_to_history(run_id: str, report: dict, filename: str):
         "sender":         report.get("sender"),
         "subject":        report.get("subject"),
         "vector_verdicts":report.get("vector_verdicts"),
-    })
+    }
+    if message_id:
+        entry["message_id"] = message_id
+        entry["source"] = "gmail"
+    _history.append(entry)
     _save_history()
 
 
@@ -196,7 +223,34 @@ async def generate_benign_ep():
 
 @app.get("/history")
 async def history():
-    return {"runs": list(reversed(_history))[:10]}
+    _load_history()
+    return {"runs": list(reversed(_history))[:50]}
+
+
+@app.get("/api/report/{run_id}")
+async def get_report(run_id: str):
+    path = os.path.join(REPORTS_DIR, f"{run_id}.json")
+    if os.path.exists(path):
+        with open(path) as f:
+            return json.load(f)
+    # Check if run_id is a message ID
+    msg_path = os.path.join(REPORTS_DIR, f"msg_{run_id}.json")
+    if os.path.exists(msg_path):
+        with open(msg_path) as f:
+            return json.load(f)
+    # Fallback to history summary if full report not saved
+    _load_history()
+    for h in _history:
+        if h.get("run_id") == run_id or h.get("message_id") == run_id:
+            return h
+    return JSONResponse({"error": "Report not found", "run_id": run_id}, status_code=404)
+
+
+@app.get("/api/gmail-feed")
+async def gmail_feed():
+    _load_history()
+    gmail_runs = [r for r in reversed(_history) if r.get("source") == "gmail" or r.get("message_id")]
+    return {"gmail_runs": gmail_runs[:50]}
 
 
 @app.websocket("/ws/{run_id}")

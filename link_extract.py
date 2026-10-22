@@ -70,11 +70,11 @@ def analyze_url(url: str) -> dict:
 
     if hostname in KNOWN_SHORTENERS:
         flags.append("uses a link-shortening service (hides real destination)")
-        score += 0.3
+        score += 0.45
 
     if _looks_like_ip(hostname):
-        flags.append("destination is a raw IP address, not a domain name")
-        score += 0.3
+        flags.append("destination is a raw IP address, not a domain name (high-risk evasion technique)")
+        score += 0.60
 
     lookalike = _closest_impersonated_domain(hostname)
     if lookalike:
